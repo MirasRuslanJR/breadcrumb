@@ -1,0 +1,48 @@
+# Builds an unsigned .ipa on GitHub's Macs, so the app can be developed from Windows.
+# Download the "Breadcrumb-ipa" artifact from the run and install it with Sideloadly.
+name: Build iPhone app
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      # Debug on purpose: RevenueCat Test Store keys only work in debug builds.
+      - name: Build
+        env:
+          RC_KEY: ${{ secrets.REVENUECAT_TEST_KEY }}
+        run: |
+          xcodebuild build -quiet \
+            -project Breadcrumb.xcodeproj \
+            -scheme Breadcrumb \
+            -configuration Debug \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            REVENUECAT_API_KEY="$RC_KEY"
+
+      - name: Package .ipa
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Debug-iphoneos/Breadcrumb.app Payload/
+          zip -qry Breadcrumb.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Breadcrumb-ipa
+          path: Breadcrumb.ipa

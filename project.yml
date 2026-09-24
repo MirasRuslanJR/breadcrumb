@@ -1,0 +1,78 @@
+name: Breadcrumb
+
+options:
+  bundleIdPrefix: com.mirasruslan
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    # Sideloading tools don't re-sign Xcode's separate debug dylib, so keep everything in one binary.
+    ENABLE_DEBUG_DYLIB: NO
+    ENABLE_PREVIEWS: NO
+
+packages:
+  RevenueCat:
+    url: https://github.com/RevenueCat/purchases-ios-spm.git
+    from: 5.0.0
+
+targets:
+  Breadcrumb:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+      - path: Shared
+    dependencies:
+      - package: RevenueCat
+        product: RevenueCat
+      - package: RevenueCat
+        product: RevenueCatUI
+      - target: BreadcrumbWidgets
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Breadcrumb
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        NSSupportsLiveActivities: true
+        NSMicrophoneUsageDescription: Breadcrumb only listens while you're telling it what you're about to do.
+        NSSpeechRecognitionUsageDescription: Your words are turned into text on your iPhone so Breadcrumb can pin them to the top of your screen.
+        RevenueCatAPIKey: $(REVENUECAT_API_KEY)
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.mirasruslan.breadcrumb
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: $(inherited) MAIN_APP
+        # Filled in at build time from the REVENUECAT_TEST_KEY repository secret.
+        REVENUECAT_API_KEY: ""
+    scheme: {}
+
+  BreadcrumbWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Widgets
+      - path: Shared
+    info:
+      path: Widgets/Info.plist
+      properties:
+        CFBundleDisplayName: Breadcrumb
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.mirasruslan.breadcrumb.widgets

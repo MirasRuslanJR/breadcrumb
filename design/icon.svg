@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#FFC766"/>
+      <stop offset="1" stop-color="#EE7426"/>
+    </linearGradient>
+    <linearGradient id="crumb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFF8EC"/>
+      <stop offset="1" stop-color="#FBE3BD"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+
+  <!-- The Dynamic Island, holding your thought -->
+  <rect x="332" y="150" width="360" height="104" rx="52" fill="#1E140C"/>
+  <circle cx="392" cy="202" r="24" fill="#FFB54D"/>
+  <rect x="436" y="190" width="170" height="24" rx="12" fill="#FFB54D" opacity="0.55"/>
+
+  <!-- The trail of crumbs back to it -->
+  <circle cx="468" cy="292" r="14" fill="#FFF3DF" opacity="0.7"/>
+  <circle cx="548" cy="330" r="18" fill="#FFF3DF" opacity="0.85"/>
+  <circle cx="470" cy="374" r="22" fill="#FFF3DF"/>
+
+  <g transform="translate(0 26)">
+  <!-- The slice of bread -->
+  <path d="M 344 640
+           C 270 628 262 516 340 486
+           C 368 428 440 404 512 404
+           C 584 404 656 428 684 486
+           C 762 516 754 628 680 640
+           L 680 832
+           Q 680 870 642 870
+           L 382 870
+           Q 344 870 344 832
+           Z"
+        fill="url(#crumb)" stroke="#B9632A" stroke-width="30" stroke-linejoin="round"/>
+
+  <!-- A friendly face -->
+  <ellipse cx="452" cy="668" rx="18" ry="24" fill="#3A2415"/>
+  <ellipse cx="572" cy="668" rx="18" ry="24" fill="#3A2415"/>
+  <path d="M 470 736 Q 512 772 554 736" fill="none" stroke="#3A2415" stroke-width="16" stroke-linecap="round"/>
+  <ellipse cx="418" cy="722" rx="24" ry="14" fill="#F59B6B" opacity="0.45"/>
+  <ellipse cx="606" cy="722" rx="24" ry="14" fill="#F59B6B" opacity="0.45"/>
+  </g>
+</svg>
