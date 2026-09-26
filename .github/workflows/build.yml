@@ -7,6 +7,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: macos-15
@@ -21,11 +25,12 @@ jobs:
         run: xcodegen generate
 
       # Debug on purpose: RevenueCat Test Store keys only work in debug builds.
+      # Compile errors are re-posted as annotations so they're readable without opening the log.
       - name: Build
         env:
           RC_KEY: ${{ secrets.REVENUECAT_TEST_KEY }}
         run: |
-          xcodebuild build -quiet \
+          if ! xcodebuild build -quiet \
             -project Breadcrumb.xcodeproj \
             -scheme Breadcrumb \
             -configuration Debug \
@@ -34,7 +39,18 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            REVENUECAT_API_KEY="$RC_KEY"
+            REVENUECAT_API_KEY="$RC_KEY" > build.log 2>&1
+          then
+            grep -E ": error: " build.log | sed "s|$GITHUB_WORKSPACE/||" | sort -u > errors.txt || true
+            [ -s errors.txt ] || tail -25 build.log > errors.txt
+            split -l 12 errors.txt chunk_
+            for chunk in chunk_*; do
+              echo "::error title=Build failed::$(sed 's/%/%25/g' "$chunk" | awk '{printf "%s%%0A", $0}')"
+            done
+            tail -80 build.log
+            exit 1
+          fi
+          grep -E ": warning: " build.log | sed "s|$GITHUB_WORKSPACE/||" | sort -u | head -40 || true
 
       - name: Package .ipa
         run: |
